@@ -1,6 +1,9 @@
 from __future__ import division
+
 import random
 import numpy as np
+
+from math import ceil, floor
 
 from functools import partial
 from operator import attrgetter
@@ -69,21 +72,34 @@ def selTournament(individuals, k, tournsize, fit_attr="fitness"):
         chosen.append(max(aspirants, key=attrgetter(fit_attr)))
     return chosen
 	
-def selTournamentFineGrained(individuals, k, tournsize, fit_attr="fitness"):
-    """Select the best individual among *tournsize* randomly chosen
-    individuals, *k* times. The list returned contains
+def selTournamentFineGrained(individuals, k, fgtournsize, fit_attr="fitness"):
+    """Select the best individual among (in average) *fgtournsize* randomly 
+    chosen individuals, *k* times. The list returned contains
     references to the input *individuals*.
     
     :param individuals: A list of individuals to select from.
     :param k: The number of individuals to select.
-    :param tournsize: The number of individuals participating in each tournament.
+    :param fgtournsize: The average number of individuals participating in each 
+        tournament.
     :param fit_attr: The attribute of individuals to use as selection criterion
     :returns: A list of selected individuals.
     
     This function uses the :func:`~random.choice` function from the python base
     :mod:`random` module.
-    .. [Luke2002fighting] Luke and Panait, 2002, Fighting bloat with 
-        nonparametric parsimony pressure   """
+    .. [Filipovic2003Fine] Filipovic, 2003, Fine grained tournament selection
+    operator in Genetic Algorithms """
+    chosen = []
+    tournsizeminus = int(floor(fgtournsize))
+    tournsizeplus = tournsizeminus + 1
+    kminus = int(ceil(k*(tournsizeplus - fgtournsize)) )
+    kplus = k - kminus
+    for i in xrange(kminus):
+        aspirants = selRandom(individuals, tournsizeminus)
+        chosen.append(max(aspirants, key=attrgetter(fit_attr)))
+    for i in xrange(kplus):
+        aspirants = selRandom(individuals, tournsizeplus)
+        chosen.append(max(aspirants, key=attrgetter(fit_attr)))
+    return chosen
 
 
 def selRoulette(individuals, k, fit_attr="fitness"):
@@ -339,6 +355,7 @@ def selAutomaticEpsilonLexicase(individuals, k):
 
 
 __all__ = ['selRandom', 'selBest', 'selWorst', 'selRoulette',
-           'selTournament', 'selDoubleTournament', 'selStochasticUniversalSampling',
+           'selTournament', 'selTournamentFineGrained', 'selDoubleTournament', 
+           'selStochasticUniversalSampling',
            'selLexicase', 'selEpsilonLexicase', 'selAutomaticEpsilonLexicase']
 
