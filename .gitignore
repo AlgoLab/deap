@@ -12,3 +12,7 @@ MANIFEST
 *.orig
 .DS_Store
 *.so
+/deap.egg-info/PKG-INFO
+/deap.egg-info/SOURCES.txt
+/deap.egg-info/dependency_links.txt
+/deap.egg-info/top_level.txt
